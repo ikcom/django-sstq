@@ -1,0 +1,41 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "Python 3",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/python:3-3.14-trixie",
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers-extra/features/uv": {
+			"version": "latest"
+		}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"charliermarsh.ruff",
+				"ms-python.python",
+				"njpwerner.autodocstring",
+				"trond-snekvik.simple-rst",
+				"ritwickdey.LiveServer"
+			],
+			"settings": {
+				"[python]": {
+					"editor.defaultFormatter": "charliermarsh.ruff"
+				}
+			}
+		}
+	},
+	"mounts": [
+		"source=${localWorkspaceFolder}/.devcontainer/.bash_aliases,target=/home/vscode/.bash_aliases,type=bind,consistency=cached"
+	],
+	"remoteEnv": {
+		"WORKSPACE": "${containerWorkspaceFolder}",
+		"MANAGE_PY_PATH": "${containerWorkspaceFolder}/manage.py",
+		"PYTHONDONTWRITEBYTECODE": "1",
+		"PYTHONUNBUFFERED": "1"
+	}
+	// "forwardPorts": [],
+	// "postCreateCommand": "pip install -r requirements.txt",
+	// "customizations": {},
+}

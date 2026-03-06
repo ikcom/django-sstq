@@ -1,0 +1,16 @@
+header {
+    background-color: #187f58;
+    color: var(--color-foreground);
+}
+
+#search-input {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+}
+
+
+#search-input:focus-visible {
+    outline: unset;
+    box-shadow: unset;
+    color: var(--color-foreground) !important;
+}

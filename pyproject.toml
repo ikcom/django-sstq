@@ -1,0 +1,28 @@
+[project]
+name = "sstq"
+version = "0.1.0"
+description = "Super Simple Task Queue"
+readme = "README.md"
+authors = [
+    { name = "Ilir Kokollari", email = "ilir@ilirkokollari.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "django>=6.0.3",
+]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["sstq*"]
+
+[dependency-groups]
+dev = [
+    "watchdog>=6.0.0",
+]
+docs = [
+    "sphinx==8.2.3",
+    "sphinxawesome-theme>=6.0.0",
+]
