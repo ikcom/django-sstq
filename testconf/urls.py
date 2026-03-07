@@ -1,6 +1,9 @@
 """
 URL configuration for conf project.
 
+Portions of this file are derived from Django's project template.
+See THIRD_PARTY_LICENSES for attribution and license details.
+
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
 Examples:

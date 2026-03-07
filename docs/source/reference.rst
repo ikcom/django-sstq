@@ -1,8 +1,8 @@
 Reference
 =========
 
-.. automodule:: sstq
-    :members:
-
-.. autoclass:: sstq.base.TaskDefinitionOverrideOptions
-    :members:
+.. toctree::
+    :maxdepth: 2
+    
+    sstq/base
+    sstq/backends

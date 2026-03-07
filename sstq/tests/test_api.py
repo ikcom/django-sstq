@@ -11,7 +11,12 @@ class APITestCase(TestCase):
         self.assertTrue(
             hasattr(sstq, "TaskDefinition"), "'sstq' should expose 'TaskDefinition' class"
         )
-        self.assertTrue(hasattr(sstq, "BoundTask"), "'sstq' should expose 'BoundTask' class")
+        self.assertTrue(hasattr(sstq, "TaskStatus"), "'sstq' should expose 'TaskStatus' class")
+        self.assertTrue(hasattr(sstq, "Future"), "'sstq' should expose 'Future' class")
+        self.assertTrue(hasattr(sstq, "TasksConfig"), "'sstq' should expose 'TasksConfig' type")
+        self.assertTrue(
+            hasattr(sstq, "backends"), "'sstq' should expose 'backends' connection handler"
+        )
 
     def test_task_status(self):
         import sstq

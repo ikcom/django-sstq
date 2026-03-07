@@ -63,3 +63,12 @@ class UtilsTestCase(TestCase):
             is_fully_qualified_function(module.test_nested_func()),
             "A nested function should not be considered fully qualified",
         )
+
+        self.assertFalse(
+            is_fully_qualified_function(int),
+            "Built-in functions should not be considered fully qualified",
+        )
+        self.assertFalse(
+            is_fully_qualified_function(type("Mock", (), {"__call__": any})()),  # pyright: ignore[reportArgumentType]
+            "Callable objects that are not functions should not be considered fully qualified",
+        )

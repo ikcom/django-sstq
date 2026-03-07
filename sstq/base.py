@@ -1,6 +1,7 @@
 import inspect
 from typing import TYPE_CHECKING, Any, Callable, Optional, Self, TypedDict, Unpack, overload
 from uuid import UUID, uuid7
+from warnings import deprecated
 
 from django.db import models
 from django.utils.translation import pgettext_lazy
@@ -9,43 +10,37 @@ from sstq.utils import is_fully_qualified_function, make_qualified_name
 
 DEFAULT_TASK_PRIORITY = 0
 DEFAULT_TASK_QUEUE_NAME = "default"
+DEFAULT_TASK_BACKEND_ALIAS = "default"
+SETTINGS_KEY = "TASKS"
 
 if TYPE_CHECKING:
-    from sstq.backends.base import BaseBackend
+    from sstq.backends.base import (
+        BaseBackend,
+        StatusQueryResult,
+    )
 
 
 class TaskStatus(models.IntegerChoices):
     """Enumeration of possible task statuses in the SSTQ system."""
 
+    #: Enqueued task available for execution. See also :term:`TaskStatus.AVAILABLE`
     AVAILABLE = 10, pgettext_lazy("TaskStatus", "Available")
-    """A task is available when it is ready to be executed but has not yet
-    been picked up by a worker. This is the initial state of a task after it is enqueued.
-    Available tasks can be picked up by workers for execution or
-    canceled before they are."""
 
+    #: Task is currently running. See also :term:`TaskStatus.RUNNING`
     RUNNING = 20, pgettext_lazy("TaskStatus", "Running")
-    """A task is running as soon as it is picked by a worker.
-    It may not have started executing yet, but it's no longer available for other workers to
-    pick up and it can't be canceled."""
 
-    CANCELED = 30, pgettext_lazy("TaskStatus", "Canceled")
-    """A task is canceled when it has been explicitly canceled while it was still
-    available. Canceled tasks will not be picked up by workers and cannot transition
-    to other states. A running task cannot be canceled."""
+    #: Task has failed. See also :term:`TaskStatus.FAILED`
+    FAILED = 30, pgettext_lazy("TaskStatus", "Failed")
 
-    FAILED = 40, pgettext_lazy("TaskStatus", "Failed")
-    """A task has failed if execution was interrupted before a value was returned, either
-    due to an exception or because the worker process was terminated.
-    Only running tasks can transition to failed.
-    """
+    #: Task has been canceled. See also :term:`TaskStatus.CANCELED`
+    CANCELED = 40, pgettext_lazy("TaskStatus", "Canceled")
 
+    #: Task is done. See also :term:`TaskStatus.DONE`
     DONE = 50, pgettext_lazy("TaskStatus", "Done")
-    """A task is done when it has completed execution and returned a value successfully.
-    Only running tasks can transition to done."""
 
 
 class TaskDefinitionOverrideOptions(TypedDict, total=False):
-    """Task definition override options that can be specified in :meth:`TaskDefinition.using`."""
+    """Task definition override options that can be specified in :meth:`sstq.TaskDefinition.using`."""
 
     backend: str
     queue: str
@@ -74,9 +69,7 @@ class TaskDefinition[**P, R]:
     priority: int
     """The priority level for this task. Higher values indicate higher priority."""
 
-    backend: Optional[str]
-    """The backend alias to use when enqueueing this task.
-    If not specified, the default backend will be used."""
+    _backend: Optional[BaseBackend[P, R]]
 
     def __init__(
         self,
@@ -97,34 +90,36 @@ class TaskDefinition[**P, R]:
         self.signature = inspect.signature(func)
         self.queue = queue
         self.priority = priority
-        self.backend = backend
+        self._backend_alias = backend
+
+        self._backend = None
 
     def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R:
         """Execute the task function with the given arguments."""
         return self.func(*args, **kwargs)
 
-    def enqueue(self, *args: P.args, **kwargs: P.kwargs) -> BoundTask[P, R]:
+    def enqueue(self, *args: P.args, **kwargs: P.kwargs) -> Future[P, R]:
         """Enqueue this task with the given arguments. This method creates a bound task instance
         that encapsulates the task definition along with the specific arguments for execution.
         """
-        return self.get_backend().enqueue(self, *args, **kwargs)
+        return self.backend.enqueue(self, *args, **kwargs)
 
     def using(self, **overrides: Unpack[TaskDefinitionOverrideOptions]) -> Self:
-        """Override task definition properties for the next enqueue operation.
-
-        Keyword arguments from :class:`TaskDefinitionOverrideOptions`:
+        """Override :term:`task definition` properties for the next enqueue operation.
 
         Parameters
         ----------
         backend : str, Optional
-            Override the default backend. The task will be enqueued to the
-            specified backend instead of the one defined in this TaskDefinition.
+            Backend alias to use for the next enqueue operation.
         queue : str, Optional
-            Override the default queue. The task will be enqueued to
-            the specified queue instead of the one defined in this TaskDefinition.
+            Queue name to use for the next enqueue operation.
         priority : int, Optional
-            Override the default priority. The task will be enqueued
-            with the specified priority instead of the one defined in this TaskDefinition.
+            Priority level to use for the next enqueue operation.
+
+        Returns
+        -------
+        Self
+            A new :term:`task definition` instance with the specified overrides.
         """
 
         if overrides:
@@ -138,40 +133,81 @@ class TaskDefinition[**P, R]:
 
         return self
 
-    def get_backend(self) -> BaseBackend:
-        from sstq.backends.dummy import DummyBackend
+    @property
+    def backend(self) -> BaseBackend[P, R]:
+        """The backend instance that this task definition is associated with. This is determined
+        by the backend alias specified in the task definition or by the default backend if no
+        alias is provided.
+        """
+        if self._backend is None:
+            from sstq import backends
 
-        return DummyBackend("dummy")
+            self._backend = backends[self._backend_alias or DEFAULT_TASK_BACKEND_ALIAS]
+
+        return self._backend
 
 
-class BoundTask[**P, R]:
+class BoundParameters(TypedDict):
+    args: tuple[Any, ...]
+    kwargs: dict[str, Any]
+
+
+class Future[**P, R]:
     """Represents an enqueued task that is bound to specific parameters and queue order."""
 
     task_def: TaskDefinition[P, R]
     """The task definition that this bound task is an instance of."""
 
-    args: tuple[Any, ...]
-    """The positional arguments that will be passed to the task function when executed."""
-
-    kwargs: dict[str, Any]
-    """The keyword arguments that will be passed to the task function when executed."""
+    params: BoundParameters
+    """The parameters that will be passed to the task function when executed."""
 
     queue_id: UUID
     """A unique identifier for this bound task in the queue.
     This can be used by backends to track and manage the task."""
 
-    def __init__(self, task_def: TaskDefinition[P, R], *args: P.args, **kwargs: P.kwargs) -> None:
-        self.task_def = task_def
-        self.args = args
-        self.kwargs = kwargs
-        self.queue_id = uuid7()
+    _result: StatusQueryResult[R]
 
-    def result(self) -> R:
-        """If the backend supports retrieving results,
-        this method will return the result of the task execution.
-        If the task has not completed yet, this method may block until the result is available.
+    def __init__(
+        self,
+        task_def: TaskDefinition[P, R],
+        params: BoundParameters,
+        result: StatusQueryResult[R],
+    ) -> None:
+        self.task_def = task_def
+        self.params = params
+        self.queue_id = uuid7()
+        self._result = result
+
+    def result(self, timeout: Optional[int | float] = None) -> R:
+        """Retrieve the result of this enqueued task, blocking until the result is available
+        or timeout is reached. If the task"""
+        return self.task_def.backend.get_task_result(self, timeout=timeout)
+
+    def exception(self, timeout: Optional[int | float] = None) -> BaseException | str | None:
+        return self.task_def.backend.get_task_exception(self, timeout=timeout)
+
+    @deprecated("set_result should only be used by backends")
+    def set_result(self, result: StatusQueryResult[R]) -> None:
+        """This method should be used only by backends."""
+        self._result = result
+
+    def running(self) -> bool:
+        """Check if the task is currently :term:`running`."""
+        return self.task_def.backend.is_task_running(self)
+
+    def done(self) -> bool:
+        """Return True if queued task was successfully :term:`cancelled` or finished :term:`running`."""
+        return self.task_def.backend.is_task_done(self)
+
+    def cancelled(self) -> bool:
+        """Return True if queued task was successfully :term:`cancelled`."""
+        return self.task_def.backend.is_task_canceled(self)
+
+    def cancel(self) -> bool:
+        """Attempt to cancel the task if it has not started running yet. The actual cancellation
+        behavior depends on the backend implementation and may not be guaranteed.
         """
-        raise NotImplementedError("This backend does not support retrieving task results.")
+        return self.task_def.backend.cancel_task(self)
 
 
 @overload

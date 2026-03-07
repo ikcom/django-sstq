@@ -1,3 +1,9 @@
+html {
+    /* Set this to the height of your fixed navbar */
+    scroll-padding-top: 60px;
+    scroll-behavior: smooth;
+}
+
 header {
     background-color: #187f58;
     color: var(--color-foreground);

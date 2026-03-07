@@ -2,7 +2,8 @@
 name = "sstq"
 version = "0.1.0"
 description = "Super Simple Task Queue"
-readme = "README.md"
+readme = "README.rst"
+license-files = ["LICENSE", "THIRD_PARTY_LICENSES"]
 authors = [
     { name = "Ilir Kokollari", email = "ilir@ilirkokollari.com" }
 ]
@@ -18,11 +19,45 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["sstq*"]
 
+[tool.setuptools]
+include-package-data = true
+
 [dependency-groups]
 dev = [
+    "coverage>=7.13.4",
     "watchdog>=6.0.0",
 ]
 docs = [
+    "furo>=2025.12.19",
     "sphinx==8.2.3",
-    "sphinxawesome-theme>=6.0.0",
 ]
+
+[tool.coverage.run]
+source = ["sstq"]
+branch = true
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "*/test_*.py",
+    "testconf/*",
+    "manage.py",
+    "sstq/__init__.py",
+]
+
+[tool.coverage.report]
+precision = 2
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "@overload",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"

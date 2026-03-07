@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 
+# Derived from Django's startproject template.
+# See THIRD_PARTY_LICENSES for attribution and license details.
+
 import os
 import sys
 
