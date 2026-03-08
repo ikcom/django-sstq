@@ -1,19 +1,47 @@
 [project]
-name = "sstq"
-version = "0.1.0"
+name = "django-sstq"
+dynamic = ["version"]
 description = "Super Simple Task Queue"
-readme = "README.rst"
+readme = "README.md"
 license-files = ["LICENSE", "THIRD_PARTY_LICENSES"]
 authors = [
     { name = "Ilir Kokollari", email = "ilir@ilirkokollari.com" }
 ]
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 dependencies = [
-    "django>=6.0.3",
+    "django>=4.2",
 ]
 
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 6.0",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Repository = "https://github.com/ikcom/django-sstq"
+Documentation = "https://django-sstq.readthedocs.io"
+Issues = "https://github.com/ikcom/django-sstq/issues"
+Changelog = "https://github.com/ikcom/django-sstq/releases"
+
+
 [build-system]
-requires = ["setuptools >= 77.0.3"]
+requires = ["setuptools >= 77.0.3", "setuptools_scm >= 9.2.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -25,12 +53,13 @@ include-package-data = true
 [dependency-groups]
 dev = [
     "coverage>=7.13.4",
-    "watchdog>=6.0.0",
+    "setuptools-scm>=9.2.2",
 ]
 docs = [
     "furo>=2025.12.19",
     "sphinx>=9.1.0",
     "sphinxcontrib-django>=2.5",
+    "watchdog>=6.0.0",
 ]
 
 [tool.coverage.run]
@@ -62,3 +91,6 @@ exclude_lines = [
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[tool.setuptools_scm]
+# Automatically sets version from git tags

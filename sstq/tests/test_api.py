@@ -22,7 +22,10 @@ class APITestCase(TestCase):
         import sstq
 
         self.assertTrue(hasattr(sstq, "TaskStatus"), "'sstq' should expose 'TaskStatus' class")
-        self.assertIsSubclass(sstq.TaskStatus, int, "'TaskStatus' should be a subclass of 'int'")
+        self.assertTrue(
+            issubclass(sstq.TaskStatus, int),  # pyright: ignore[reportUnnecessaryIsInstance]
+            "'TaskStatus' should be a subclass of 'int'",
+        )
         self.assertTrue(
             hasattr(sstq.TaskStatus, "AVAILABLE"), "'TaskStatus' should have 'AVAILABLE' status"
         )

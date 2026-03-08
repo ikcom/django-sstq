@@ -8,7 +8,12 @@
 	"features": {
 		"ghcr.io/devcontainers-extra/features/uv": {
 			"version": "latest"
-		}
+		},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker": {
+			"version": "latest",
+			"moby": false
+		},
+		"ghcr.io/dhoeric/features/act": {}
 	},
 	"customizations": {
 		"vscode": {
@@ -17,7 +22,9 @@
 				"ms-python.python",
 				"njpwerner.autodocstring",
 				"trond-snekvik.simple-rst",
-				"ritwickdey.LiveServer"
+				"ritwickdey.LiveServer",
+				"github.vscode-github-actions",
+				"SanjulaGanepola.github-local-actions"
 			],
 			"settings": {
 				"[python]": {
@@ -27,7 +34,8 @@
 		}
 	},
 	"mounts": [
-		"source=${localWorkspaceFolder}/.devcontainer/.bash_aliases,target=/home/vscode/.bash_aliases,type=bind,consistency=cached"
+		"source=${localWorkspaceFolder}/.devcontainer/.bash_aliases,target=/home/vscode/.bash_aliases,type=bind,consistency=cached",
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
 	"remoteEnv": {
 		"WORKSPACE": "${containerWorkspaceFolder}",

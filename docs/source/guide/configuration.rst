@@ -5,6 +5,8 @@ For convenience, ``django-sstq`` provides a :func:`sstq.Config` function for aut
 assisted configuration of :setting:`TASKS` 
 
 .. code-block:: python
+   
+   # myproject/settings.py
 
    from sstq import Config
    

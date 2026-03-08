@@ -16,28 +16,39 @@ Install the package:
 Configuration
 -------------
 
-Add ``sstq`` to ``INSTALLED_APPS``:
+Add ``sstq`` to :setting:`INSTALLED_APPS`.
 
 .. code-block:: python
 
    INSTALLED_APPS = [
-       ...,
+       ... ,
        "sstq",
+       "sstq.backends.model", # Optional, only if you want to use the model backend
    ]
-
-To use the model backend, also add ``sstq.backends.model`` and run migrations:
 
 .. code-block:: python
+   
+   # myproject/settings.py
 
-   INSTALLED_APPS = [
-       ...,
-       "sstq",
-       "sstq.backends.model",
-   ]
+   from sstq import Config
+   
+   ...
+
+    TASKS = sstq.Config(
+        default={
+            "BACKEND": "sstq.backends.threaded.ThreadedBackend",
+        },
+        model={
+            "BACKEND": "sstq.backends.model.ModelBackend",
+        },
+    )
+
+Run migrations if you want to use the :term:`model backend`:
 
 .. code-block:: bash
 
    python manage.py migrate sstq.backends.model
+
 
 Task Definition
 ---------------

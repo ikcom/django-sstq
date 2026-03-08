@@ -1,5 +1,9 @@
 import inspect
-from typing import Any, Callable
+from types import ModuleType
+from typing import TYPE_CHECKING, Any, Callable
+
+if TYPE_CHECKING:
+    from sstq.base import TaskDefinition
 
 
 def make_qualified_name(func: Callable[..., Any]) -> str:
@@ -15,3 +19,18 @@ def is_fully_qualified_function(func: Callable[..., Any]) -> bool:
         return False
 
     return "<locals>" not in func.__qualname__
+
+
+def discover_tasks(place: ModuleType | type) -> list["TaskDefinition[..., Any]"]:
+    """Discover task definitions in a module or class."""
+    from sstq.base import TaskDefinition
+
+    tasks: list[TaskDefinition[..., Any]] = []
+    for _, obj in inspect.getmembers(place):
+        if isinstance(obj, TaskDefinition):
+            tasks.append(obj)  # type: ignore[arg-type]
+
+        elif inspect.isclass(obj):
+            tasks.extend(discover_tasks(obj))
+
+    return tasks

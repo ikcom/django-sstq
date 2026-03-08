@@ -12,3 +12,5 @@ wheels/
 # IDE files
 .vscode/
 .idea/
+
+.coverage

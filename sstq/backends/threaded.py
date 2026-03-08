@@ -112,7 +112,7 @@ class ThreadedBackend[**P, R](BaseBackend[P, R]):
         ----------
         wait : bool
             If True, block until the worker thread exits.
-        timeout : float, optional
+        timeout : float, Optional
             Maximum seconds to wait for the worker to stop.
         """
         self._stop_event.set()

@@ -13,6 +13,7 @@ Glossary
       Django Super Simple Task Queue
 
    task definition
+   task definitions
       A task definition is a Python function decorated with :deco:`sstq.task`.
       By default, it is an instance of :class:`TaskDefinition <sstq.base.TaskDefinition>`.
 

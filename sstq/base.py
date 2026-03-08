@@ -1,13 +1,17 @@
 import inspect
 import uuid
 from typing import TYPE_CHECKING, Any, Callable, Optional, Self, TypedDict, Unpack, overload
-from uuid import uuid7
-from warnings import deprecated
 
 from django.db import models
 from django.utils.translation import pgettext_lazy
 
 from sstq.utils import is_fully_qualified_function, make_qualified_name
+
+try:
+    from uuid import uuid7 as uuid_gen
+except ImportError:
+    from uuid import uuid4 as uuid_gen
+
 
 DEFAULT_TASK_PRIORITY = 0
 DEFAULT_TASK_QUEUE_NAME = "default"
@@ -70,7 +74,7 @@ class TaskDefinition[**P, R]:
     priority: int
     """The priority level for this task. Higher values indicate higher priority."""
 
-    _backend: Optional[BaseBackend[P, R]]
+    _backend: Optional["BaseBackend[P, R]"]
 
     def __init__(
         self,
@@ -99,7 +103,7 @@ class TaskDefinition[**P, R]:
         """Execute the task function with the given arguments."""
         return self.func(*args, **kwargs)
 
-    def enqueue(self, *args: P.args, **kwargs: P.kwargs) -> Future[P, R]:
+    def enqueue(self, *args: P.args, **kwargs: P.kwargs) -> "Future[P, R]":
         """Enqueue this task with the given arguments. This method creates a bound task instance
         that encapsulates the task definition along with the specific arguments for execution.
         """
@@ -135,7 +139,7 @@ class TaskDefinition[**P, R]:
         return self
 
     @property
-    def backend(self) -> BaseBackend[P, R]:
+    def backend(self) -> "BaseBackend[P, R]":
         """The backend instance that this task definition is associated with. This is determined
         by the backend alias specified in the task definition or by the default backend if no
         alias is provided.
@@ -166,17 +170,17 @@ class Future[**P, R]:
     """A unique identifier for this bound task in the queue.
     This can be used by backends to track and manage the task."""
 
-    _result: StatusQueryResult[R]
+    _result: "StatusQueryResult[R]"
 
     def __init__(
         self,
         task_def: TaskDefinition[P, R],
         params: BoundParameters,
-        result: StatusQueryResult[R],
+        result: "StatusQueryResult[R]",
     ) -> None:
         self.task_def = task_def
         self.params = params
-        self.queue_id = uuid7()
+        self.queue_id = uuid_gen()
         self._result = result
 
     def result(self, timeout: Optional[int | float] = None) -> R:
@@ -187,8 +191,7 @@ class Future[**P, R]:
     def exception(self, timeout: Optional[int | float] = None) -> BaseException | str | None:
         return self.task_def.backend.get_task_exception(self, timeout=timeout)
 
-    @deprecated("set_result should only be used by backends")
-    def set_result(self, result: StatusQueryResult[R]) -> None:
+    def set_result(self, result: "StatusQueryResult[R]") -> None:
         """This method should be used only by backends."""
         self._result = result
 

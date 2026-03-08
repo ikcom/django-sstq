@@ -10,7 +10,7 @@ from typing import Any
 from django.test import TestCase, override_settings
 
 import sstq
-from sstq.backends.thread import CancelledError, ThreadedBackend
+from sstq.backends.threaded import CancelledError, ThreadedBackend
 from sstq.base import Future, TaskDefinition, TaskStatus
 
 THREADED_SETTINGS = sstq.Config(

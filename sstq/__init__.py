@@ -1,7 +1,15 @@
+# Some code in this file is inspired and adapted by Django's Tasks framework and
+# [RealOrangeOne/django-tasks](https://github.com/RealOrangeOne/django-tasks).
+
+# Third-party attribution and license texts are available in THIRD_PARTY_LICENSES.
+
+from types import ModuleType
 from typing import Any, Callable
 
 from django.utils.connection import BaseConnectionHandler
 from django.utils.module_loading import import_string
+
+from sstq.registry import TaskRegistry
 
 from .backends.base import BaseBackend
 from .base import Future, TaskDefinition, TaskStatus, task
@@ -15,6 +23,8 @@ __all__ = [
     "Future",
     "Config",
     "backends",
+    "task_registry",
+    "register",
 ]
 
 
@@ -35,3 +45,9 @@ class TaskBackendHandler(BaseConnectionHandler):
 
 
 backends = TaskBackendHandler()
+task_registry = TaskRegistry()
+
+
+def register(*tasks: TaskDefinition[..., Any] | ModuleType | str) -> None:
+    """Register task definitions with the global registry."""
+    task_registry.register(*tasks)
