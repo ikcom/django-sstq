@@ -1,15 +1,9 @@
-import os
 import sys
 from pathlib import Path
-
-import django
 
 # Setup Django settings for Sphinx documentation
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "testconf.settings")
-
-django.setup()
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -31,8 +25,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
+    "sphinxcontrib_django",
 ]
-
 templates_path = ["_templates"]
 exclude_patterns = []
 
@@ -47,14 +41,20 @@ html_title = project
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
+    "django": ("https://docs.djangoproject.com/en/stable/", None),
 }
 
 nitpick_ignore = [
     ("py:class", "P"),
     ("py:class", "R"),
-    ("py:class", "T"),  # add
-    ("py:obj", "typing.P"),  # add
+    ("py:class", "T"),
+    ("py:obj", "typing.P"),
+    ("py:obj", "typing.R"),
+    ("py:obj", "typing.T"),
+    ("py:class", "django.db.models.enums.IntegerChoices"),  # Django internal not in intersphinx
 ]
 
 html_static_path = ["_static"]
 html_css_files = ["style.css"]
+
+django_settings = "testconf.settings"

@@ -27,7 +27,7 @@ class TaskBackendHandler(BaseConnectionHandler):
         backend = params["BACKEND"]
         try:
             backend_cls = import_string(backend)
-            return backend_cls(alias, **params)
+            return backend_cls(alias, params)
         except ImportError as e:
             raise InvalidTaskBackend(f"Could not find backend '{backend}': {e}") from e
 

@@ -1,6 +1,7 @@
 import inspect
+import uuid
 from typing import TYPE_CHECKING, Any, Callable, Optional, Self, TypedDict, Unpack, overload
-from uuid import UUID, uuid7
+from uuid import uuid7
 from warnings import deprecated
 
 from django.db import models
@@ -119,7 +120,7 @@ class TaskDefinition[**P, R]:
         Returns
         -------
         Self
-            A new :term:`task definition` instance with the specified overrides.
+            A new :class:`TaskDefinition` instance with the specified overrides.
         """
 
         if overrides:
@@ -161,7 +162,7 @@ class Future[**P, R]:
     params: BoundParameters
     """The parameters that will be passed to the task function when executed."""
 
-    queue_id: UUID
+    queue_id: uuid.UUID
     """A unique identifier for this bound task in the queue.
     This can be used by backends to track and manage the task."""
 
@@ -192,15 +193,15 @@ class Future[**P, R]:
         self._result = result
 
     def running(self) -> bool:
-        """Check if the task is currently :term:`running`."""
+        """Check if the task is currently :term:`running <TaskStatus.RUNNING>`."""
         return self.task_def.backend.is_task_running(self)
 
     def done(self) -> bool:
-        """Return True if queued task was successfully :term:`cancelled` or finished :term:`running`."""
+        """Return True if queued task was successfully :term:`canceled <TaskStatus.CANCELED>` or finished :term:`running <TaskStatus.RUNNING>`."""
         return self.task_def.backend.is_task_done(self)
 
     def cancelled(self) -> bool:
-        """Return True if queued task was successfully :term:`cancelled`."""
+        """Return True if queued task was successfully :term:`canceled <TaskStatus.CANCELED>`."""
         return self.task_def.backend.is_task_canceled(self)
 
     def cancel(self) -> bool:

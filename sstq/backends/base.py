@@ -99,7 +99,7 @@ class BaseBackend[**P, R](metaclass=ABCMeta):
         return result
 
     def is_task_done(self, task: Future[P, R]) -> bool:
-        """Return True if queued task was successfully :term:`cancelled` or finished :term:`running`."""
+        """Return True if queued task was successfully :term:`canceled <TaskStatus.CANCELED>` or finished :term:`running <TaskStatus.RUNNING>`."""
 
         if self._is_task_terminated_already(task):
             return task._result.status > TaskStatus.FAILED  # pyright: ignore[reportPrivateUsage]
@@ -107,7 +107,7 @@ class BaseBackend[**P, R](metaclass=ABCMeta):
         return self.query_task_status(task).status > TaskStatus.FAILED
 
     def is_task_running(self, task: Future[P, R]) -> bool:
-        """Return True if the call is currently :term:`running`."""
+        """Return True if the call is currently :term:`running <TaskStatus.RUNNING>`."""
 
         if self._is_task_terminated_already(task):
             return False
