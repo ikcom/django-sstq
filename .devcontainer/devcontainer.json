@@ -24,7 +24,8 @@
 				"trond-snekvik.simple-rst",
 				"ritwickdey.LiveServer",
 				"github.vscode-github-actions",
-				"SanjulaGanepola.github-local-actions"
+				"SanjulaGanepola.github-local-actions",
+				"redhat.vscode-yaml"
 			],
 			"settings": {
 				"[python]": {

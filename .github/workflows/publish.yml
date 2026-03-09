@@ -1,18 +1,24 @@
 name: Publish to PyPI
 
 on:
+  workflow_run:
+    workflows: ["CI"] # triggers after ci.yml completes
+    types: [completed]
+    branches: [main]
+
   push:
     tags:
       - "v*.*.*"
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} # only run if CI passed
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # needed for setuptools_scm
+          fetch-depth: 0 # needed for setuptools_scm
 
       - name: Set up Python
         uses: actions/setup-python@v5
