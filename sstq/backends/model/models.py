@@ -1,9 +1,13 @@
-import uuid
 from typing import Any
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+try:
+    from uuid import uuid7 as uuid_gen
+except ImportError:
+    from uuid import uuid4 as uuid_gen
 
 
 class Queue(models.Model):
@@ -23,7 +27,7 @@ class Task(models.Model):
 
     uuid = models.UUIDField(
         primary_key=True,
-        default=uuid.uuid4,
+        default=uuid_gen,
         editable=False,
         verbose_name=_("UUID"),
     )
