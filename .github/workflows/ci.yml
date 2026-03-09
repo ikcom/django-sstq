@@ -46,7 +46,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          uv sync --group=dev"
+          uv sync --group=dev
           uv add pyright
 
       - name: Run Pyright (strict mode)
@@ -76,10 +76,10 @@ jobs:
 
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         python-version: ["3.12", "3.13", "3.14"]
         django-version: ["4.2", "5.0", "6.0"]
+
 
     steps:
       - uses: actions/checkout@v5
