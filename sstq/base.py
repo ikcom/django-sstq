@@ -3,12 +3,12 @@ import uuid
 from typing import TYPE_CHECKING, Any, Callable, Optional, Self, TypedDict, Unpack, overload
 
 from django.db import models
-from django.utils.translation import pgettext_lazy
+from django.utils.translation import pgettext_lazy  # pyright: ignore[reportUnknownVariableType]
 
 from sstq.utils import is_fully_qualified_function, make_qualified_name
 
 try:
-    from uuid import uuid7 as uuid_gen
+    from uuid import uuid7 as uuid_gen  # pyright: ignore[reportAttributeAccessIssue, reportUnknownVariableType]
 except ImportError:
     from uuid import uuid4 as uuid_gen
 
@@ -29,19 +29,19 @@ class TaskStatus(models.IntegerChoices):
     """Enumeration of possible task statuses in the SSTQ system."""
 
     #: Enqueued task available for execution. See also :term:`TaskStatus.AVAILABLE`
-    AVAILABLE = 10, pgettext_lazy("TaskStatus", "Available")
+    AVAILABLE = 10, pgettext_lazy("TaskStatus", "Available")  # pyright: ignore[reportAssignmentType]
 
     #: Task is currently running. See also :term:`TaskStatus.RUNNING`
-    RUNNING = 20, pgettext_lazy("TaskStatus", "Running")
+    RUNNING = 20, pgettext_lazy("TaskStatus", "Running")  # pyright: ignore[reportAssignmentType]
 
     #: Task has failed. See also :term:`TaskStatus.FAILED`
-    FAILED = 30, pgettext_lazy("TaskStatus", "Failed")
+    FAILED = 30, pgettext_lazy("TaskStatus", "Failed")  # pyright: ignore[reportAssignmentType]
 
     #: Task has been canceled. See also :term:`TaskStatus.CANCELED`
-    CANCELED = 40, pgettext_lazy("TaskStatus", "Canceled")
+    CANCELED = 40, pgettext_lazy("TaskStatus", "Canceled")  # pyright: ignore[reportAssignmentType]
 
     #: Task is done. See also :term:`TaskStatus.DONE`
-    DONE = 50, pgettext_lazy("TaskStatus", "Done")
+    DONE = 50, pgettext_lazy("TaskStatus", "Done")  # pyright: ignore[reportAssignmentType]
 
 
 class TaskDefinitionOverrideOptions(TypedDict, total=False):

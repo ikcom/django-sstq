@@ -7,7 +7,7 @@ from types import ModuleType
 from typing import Any, Callable
 
 from django.utils.connection import BaseConnectionHandler
-from django.utils.module_loading import import_string
+from django.utils.module_loading import import_string  # pyright: ignore[reportUnknownVariableType]
 
 from sstq.registry import TaskRegistry
 
@@ -44,8 +44,10 @@ class TaskBackendHandler(BaseConnectionHandler):
     exception_class = InvalidTaskBackend
 
     def create_connection(self, alias: str) -> BaseBackend[..., Any]:  # pyright: ignore[reportIncompatibleMethodOverride]
-        params = self.settings[alias]
-        backend = params["BACKEND"]
+        # Django's BaseConnectionHandler.settings is a cached_property with no type stubs,
+        # so pyright cannot infer its subscript type without django-stubs installed.
+        params: dict[str, Any] = self.settings[alias]  # pyright: ignore[reportIndexIssue, reportUnknownVariableType]
+        backend: str = params["BACKEND"]  # pyright: ignore[reportUnknownVariableType]
         try:
             backend_cls = import_string(backend)
             return backend_cls(alias, params)
