@@ -1,0 +1,33 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v3.2.0
+      hooks:
+          - id: trailing-whitespace
+          - id: end-of-file-fixer
+          - id: check-yaml
+          - id: check-added-large-files
+
+    - repo: https://github.com/astral-sh/uv-pre-commit
+      rev: 0.10.9
+      hooks:
+          - id: uv-lock
+
+    # YAML linting
+    - repo: https://github.com/adrienverge/yamllint.git
+      rev: v1.35.1
+      hooks:
+          - id: yamllint
+            args:
+                [
+                    "--strict",
+                    "-d",
+                    "{extends: default, rules: {line-length: {max: 100}}}",
+                ]
+
+    # Pyproject.toml formatting
+    - repo: https://github.com/tox-dev/pyproject-fmt
+      rev: 1.7.0
+      hooks:
+          - id: pyproject-fmt

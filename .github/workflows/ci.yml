@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -80,9 +80,8 @@ jobs:
         python-version: ["3.12", "3.13", "3.14"]
         django-version: ["4.2", "5.0", "6.0"]
 
-
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -99,6 +98,9 @@ jobs:
 
       - name: Run tests and generate coverage
         run: uv run coverage run manage.py test sstq
+
+      - name: Check coverage threshold
+        run: uv run coverage report --fail-under=85
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
