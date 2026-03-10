@@ -43,9 +43,7 @@ class ThreadedBackend[**P, R](BaseBackend[P, R]):
                 task.set_result(StatusQueryResult(status=TaskStatus.RUNNING))  # pyright: ignore[reportDeprecated]
 
             try:
-                params = task.task_def.signature.bind(*task.params["args"], **task.params["kwargs"])
-                params.apply_defaults()
-                result = task.task_def.func(*params.args, **params.kwargs)
+                result = task.task_def.func(*task.params.args, **task.params.kwargs)
                 task.set_result(StatusQueryResult(status=TaskStatus.DONE, result=result))  # pyright: ignore[reportDeprecated]
             except Exception as exc:
                 task.set_result(StatusQueryResult(status=TaskStatus.FAILED, exception=exc))  # pyright: ignore[reportDeprecated]
@@ -57,11 +55,7 @@ class ThreadedBackend[**P, R](BaseBackend[P, R]):
     def enqueue(
         self, task: TaskDefinition[P, R], *args: P.args, **kwargs: P.kwargs
     ) -> Future[P, R]:
-        future = Future(
-            task_def=task,
-            params={"args": args, "kwargs": kwargs},
-            result=StatusQueryResult(status=TaskStatus.AVAILABLE),
-        )
+        future = super().enqueue(task, *args, **kwargs)
         # Register the completion event before putting the task on the queue
         # so the worker always finds it when it signals completion.
         self._done_events[future] = Event()

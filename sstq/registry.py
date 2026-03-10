@@ -1,7 +1,6 @@
+from importlib import import_module
 from types import ModuleType
 from typing import Any
-
-from django.utils.module_loading import import_string
 
 from sstq.base import TaskDefinition
 
@@ -24,6 +23,9 @@ class TaskRegistry:
     def __len__(self) -> int:
         return len(self._registry)
 
+    def __contains__(self, item: str) -> bool:
+        return item in self._registry
+
     def _register_task(self, task: TaskDefinition[..., Any]) -> None:
         """Register a single task definition."""
         if task.name in self._registry:
@@ -32,12 +34,23 @@ class TaskRegistry:
         else:
             self._registry[task.name] = task
 
-    def register(self, *tasks: TaskDefinition[..., Any] | ModuleType | str) -> None:
+    def register(self, *tasks: TaskDefinition[..., Any] | type | ModuleType | str) -> None:
         """Register task definitions from the given tasks, modules, or module paths."""
         for item in tasks:
             if isinstance(item, TaskDefinition):
                 self._register_task(item)
 
             elif isinstance(item, str):
-                module = import_string(item)
+                module = import_module(item)
                 self.register(module)
+
+            elif isinstance(item, ModuleType):
+                for value in vars(item).values():
+                    if isinstance(value, TaskDefinition):
+                        self._register_task(value)  # type: ignore[arg-type]
+
+            else:
+                raise TypeError(
+                    f"Invalid item type for registration: {type(item).__name__}. "
+                    "Expected TaskDefinition, module, or module path string."
+                )

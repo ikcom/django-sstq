@@ -38,11 +38,15 @@ class BaseBackend[**P, R](metaclass=ABCMeta):
         self.alias = alias
         self.queues = config.get("QUEUES", [DEFAULT_TASK_QUEUE_NAME])
 
-    @abstractmethod
     def enqueue(
         self, task: TaskDefinition[P, R], *args: P.args, **kwargs: P.kwargs
     ) -> Future[P, R]:
         """Enqueue a task for execution."""
+        return Future(
+            task_def=task,
+            params={"args": args, "kwargs": kwargs},
+            result=StatusQueryResult(status=TaskStatus.AVAILABLE),
+        )
 
     @abstractmethod
     def _query_task_status(self, task: Future[P, R]) -> StatusQueryResult[R]: ...

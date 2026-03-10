@@ -1,3 +1,6 @@
+import sstq
+
+
 def test_func():
     pass
 
@@ -12,3 +15,8 @@ def test_nested_func():
         pass
 
     return inner_func
+
+
+@sstq.task
+def test_task():
+    return "test_task result"

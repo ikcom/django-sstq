@@ -12,7 +12,15 @@ from django.utils.module_loading import import_string
 from sstq.registry import TaskRegistry
 
 from .backends.base import BaseBackend
-from .base import Future, TaskDefinition, TaskStatus, task
+from .base import (
+    DEFAULT_BACKEND_ALIAS,
+    DEFAULT_TASK_PRIORITY,
+    DEFAULT_TASK_QUEUE_NAME,
+    Future,
+    TaskDefinition,
+    TaskStatus,
+    task,
+)
 from .config import Config
 from .exceptions import InvalidTaskBackend
 
@@ -25,6 +33,9 @@ __all__ = [
     "backends",
     "task_registry",
     "register",
+    "DEFAULT_TASK_QUEUE_NAME",
+    "DEFAULT_TASK_PRIORITY",
+    "DEFAULT_BACKEND_ALIAS",
 ]
 
 
