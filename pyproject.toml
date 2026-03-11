@@ -4,13 +4,9 @@ dynamic = ["version"]
 description = "Super Simple Task Queue"
 readme = "README.md"
 license-files = ["LICENSE", "THIRD_PARTY_LICENSES"]
-authors = [
-    { name = "Ilir Kokollari", email = "ilir@ilirkokollari.com" }
-]
+authors = [{ name = "Ilir Kokollari", email = "ilir@ilirkokollari.com" }]
 requires-python = ">=3.12"
-dependencies = [
-    "django>=4.2",
-]
+dependencies = ["django>=4.2"]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -44,15 +40,12 @@ Changelog = "https://github.com/ikcom/django-sstq/releases"
 requires = ["setuptools >= 77.0.3", "setuptools_scm >= 9.2.2"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-include = ["sstq*"]
-
-[tool.setuptools]
-include-package-data = true
-
 [dependency-groups]
 dev = [
     "coverage>=7.13.4",
+    "pre-commit>=4.5.1",
+    "pyright>=1.1.408",
+    "ruff>=0.15.5",
     "setuptools-scm>=9.2.2",
 ]
 docs = [
@@ -61,6 +54,12 @@ docs = [
     "sphinxcontrib-django>=2.5",
     "watchdog>=6.0.0",
 ]
+
+[tool.setuptools.packages.find]
+include = ["sstq*"]
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.coverage.run]
 source = ["sstq"]
@@ -78,6 +77,7 @@ omit = [
 precision = 2
 show_missing = true
 skip_covered = false
+fail_under = 85
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -94,3 +94,9 @@ directory = "htmlcov"
 
 [tool.setuptools_scm]
 # Automatically sets version from git tags
+
+[tool.ruff]
+line-length = 100
+
+[tool.pyright]
+typeCheckingMode = "strict"

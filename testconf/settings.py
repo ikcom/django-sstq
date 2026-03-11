@@ -125,6 +125,9 @@ STATIC_URL = "static/"
 
 TASKS = sstq.Config(
     default={
-        "BACKEND": "sstq.backends.ThreadedBackend",
-    }
+        "BACKEND": "sstq.backends.threaded.ThreadedBackend",
+    },
+    dummy={
+        "BACKEND": "sstq.backends.dummy.DummyBackend",
+    },
 )

@@ -15,7 +15,7 @@ except ImportError:
 
 DEFAULT_TASK_PRIORITY = 0
 DEFAULT_TASK_QUEUE_NAME = "default"
-DEFAULT_TASK_BACKEND_ALIAS = "default"
+DEFAULT_BACKEND_ALIAS = "default"
 SETTINGS_KEY = "TASKS"
 
 if TYPE_CHECKING:
@@ -147,7 +147,7 @@ class TaskDefinition[**P, R]:
         if self._backend is None:
             from sstq import backends
 
-            self._backend = backends[self._backend_alias or DEFAULT_TASK_BACKEND_ALIAS]
+            self._backend = backends[self._backend_alias or DEFAULT_BACKEND_ALIAS]
 
         return self._backend
 
@@ -163,7 +163,7 @@ class Future[**P, R]:
     task_def: TaskDefinition[P, R]
     """The task definition that this bound task is an instance of."""
 
-    params: BoundParameters
+    params: inspect.BoundArguments
     """The parameters that will be passed to the task function when executed."""
 
     queue_id: uuid.UUID
@@ -179,7 +179,8 @@ class Future[**P, R]:
         result: "StatusQueryResult[R]",
     ) -> None:
         self.task_def = task_def
-        self.params = params
+        self.params = task_def.signature.bind(*params["args"], **params["kwargs"])
+        self.params.apply_defaults()
         self.queue_id = uuid_gen()
         self._result = result
 
